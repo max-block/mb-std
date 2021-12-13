@@ -76,7 +76,7 @@ def hrequest(
     cookies: Optional[dict] = None,
     timeout=10,
     user_agent: Optional[str] = None,
-    json_params=False,
+    json_params: bool = True,
     auth=None,
 ) -> HResponse:
     method = method.upper()

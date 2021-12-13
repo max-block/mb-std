@@ -37,6 +37,7 @@ setuptools.setup(
             "pytest-xdist==2.5.0",
             "wheel==0.37.0",
             "twine==3.7.1",
+            "pip-audit==1.1.1",
         ],
     },
 )

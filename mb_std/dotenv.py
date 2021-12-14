@@ -7,4 +7,9 @@ load_dotenv()
 
 
 def dotenv(key: str) -> Optional[str]:
+    """Deprecated"""
+    return os.getenv(key)
+
+
+def get_dotenv(key: str) -> Optional[str]:
     return os.getenv(key)

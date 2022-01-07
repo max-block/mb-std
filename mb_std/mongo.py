@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Generic, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Generic, Tuple, Type, TypeVar
 from urllib.parse import urlparse
 
 from bson import CodecOptions, Decimal128, ObjectId
@@ -72,8 +72,8 @@ class PropertyBaseModel(BaseModel):
 
 class MongoModel(PropertyBaseModel):
     __collection__: str = ""
-    __validator__: Optional[dict] = None
-    __indexes__: list[Union[IndexModel, str]] = []
+    __validator__: dict | None = None
+    __indexes__: list[IndexModel | str] = []
 
     def to_doc(self) -> dict:
         doc = self.dict()
@@ -122,9 +122,9 @@ class MongoConnection:
 
 
 T = TypeVar("T", bound=MongoModel)
-SortType = Optional[Union[list[Tuple[str, int]], str]]
+SortType = list[Tuple[str, int]] | str | None
 QueryType = dict[str, Any]
-PKType = Union[str, ObjectIdStr, int]
+PKType = str | ObjectIdStr | int
 
 
 class MongoCollection(Generic[T]):
@@ -156,7 +156,7 @@ class MongoCollection(Generic[T]):
     def insert_many(self, docs: list[T], ordered=True) -> InsertManyResult:
         return self.collection.insert_many([obj.dict() for obj in docs], ordered=ordered)
 
-    def get_or_none(self, pk: PKType) -> Optional[T]:
+    def get_or_none(self, pk: PKType) -> T | None:
         res = self.collection.find_one({"_id": self._pk(pk)})
         if res:
             return self.model_class(**res)
@@ -170,17 +170,17 @@ class MongoCollection(Generic[T]):
     def find(self, query: QueryType, sort: SortType = None, limit: int = 0) -> list[T]:
         return [self.model_class(**d) for d in self.collection.find(query, sort=self._sort(sort), limit=limit)]
 
-    def find_one(self, query: QueryType, sort: SortType = None) -> Optional[T]:
+    def find_one(self, query: QueryType, sort: SortType = None) -> T | None:
         res = self.collection.find_one(query, sort=self._sort(sort))
         if res:
             return self.model_class(**res)
 
-    def find_one_and_update(self, query: QueryType, update: QueryType) -> Optional[T]:
+    def find_one_and_update(self, query: QueryType, update: QueryType) -> T | None:
         res = self.collection.find_one_and_update(query, update, return_document=ReturnDocument.AFTER)
         if res:
             return self.model_class(**res)
 
-    def find_by_id_and_update(self, pk: PKType, update: QueryType) -> Optional[T]:
+    def find_by_id_and_update(self, pk: PKType, update: QueryType) -> T | None:
         return self.find_one_and_update({"_id": self._pk(pk)}, update)
 
     def update_by_id(self, pk: PKType, update: QueryType) -> UpdateResult:

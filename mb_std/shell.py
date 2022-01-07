@@ -1,6 +1,5 @@
 import subprocess  # nosec
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -21,7 +20,7 @@ def run_command(cmd: str, timeout: int = 60) -> CommandResult:
         return CommandResult(stdout="", stderr="timeout", out="timeout")
 
 
-def run_ssh_command(host: str, cmd: str, ssh_key_path: Optional[str] = None, timeout=60) -> CommandResult:
+def run_ssh_command(host: str, cmd: str, ssh_key_path: str | None = None, timeout=60) -> CommandResult:
     ssh_cmd = "ssh -o 'StrictHostKeyChecking=no' -o 'LogLevel=ERROR'"
     if ssh_key_path:
         ssh_cmd += f" -i {ssh_key_path} "

@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import Optional
 
 from dateutil import parser
 
@@ -11,10 +10,10 @@ def utc_now():
 
 def utc_delta(
     *,
-    days: Optional[int] = None,
-    hours: Optional[int] = None,
-    minutes: Optional[int] = None,
-    seconds: Optional[int] = None,
+    days: int | None = None,
+    hours: int | None = None,
+    minutes: int | None = None,
+    seconds: int | None = None,
 ):
     params = {}
     if days:

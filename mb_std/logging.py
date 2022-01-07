@@ -1,15 +1,9 @@
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Optional
 
 
-def init_logger(
-    name: str,
-    file_path: Optional[str] = None,
-    file_mkdir=True,
-    level: int = logging.DEBUG,
-) -> logging.Logger:
+def init_logger(name: str, file_path: str | None = None, file_mkdir=True, level: int = logging.DEBUG) -> logging.Logger:
     log = logging.getLogger(name)
 
     log.setLevel(level)

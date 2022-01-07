@@ -1,5 +1,5 @@
-from mb_std.dotenv import dotenv
+from mb_std import get_dotenv
 
 
 def test_dotenv():
-    assert dotenv("TEST_DOTENV") == "777"
+    assert get_dotenv("TEST_DOTENV") == "777"

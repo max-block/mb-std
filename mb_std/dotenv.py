@@ -1,15 +1,9 @@
 import os
-from typing import Optional
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-def dotenv(key: str) -> Optional[str]:
-    """Deprecated"""
-    return os.getenv(key)
-
-
-def get_dotenv(key: str) -> Optional[str]:
+def get_dotenv(key: str) -> str | None:
     return os.getenv(key)

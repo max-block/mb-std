@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 from pydantic import Field
 from pymongo import IndexModel
@@ -11,7 +9,7 @@ from mb_std.mongo import MongoCollection, MongoModel, ObjectIdStr, parse_str_ind
 class Data(MongoModel):
     __collection__ = "data"
     __indexes__ = ["!name"]
-    id: Optional[ObjectIdStr] = Field(None, alias="_id")
+    id: ObjectIdStr | None = Field(None, alias="_id")
     name: str
 
 
@@ -19,7 +17,7 @@ def test_wrap_object_id(mongo_database):
     # with wrapper
     class Data1(MongoModel):
         __collection__ = "data1"
-        id: Optional[ObjectIdStr] = Field(None, alias="_id")
+        id: ObjectIdStr | None = Field(None, alias="_id")
         name: str
 
     coll = MongoCollection(Data1, mongo_database)
@@ -28,7 +26,7 @@ def test_wrap_object_id(mongo_database):
     # without wrapper
     class Data2(MongoModel):
         __collection__ = "data2"
-        id: Optional[int] = Field(None, alias="_id")
+        id: int | None = Field(None, alias="_id")
         name: str
 
     coll = MongoCollection(Data2, mongo_database, False)
@@ -45,7 +43,7 @@ def test_mongo_model_init_collection(mongo_database):
 def test_schema_validation(mongo_database):
     class Data3(MongoModel):
         __collection__ = "data3"
-        id: Optional[int] = Field(None, alias="_id")
+        id: int | None = Field(None, alias="_id")
         name: str
         value: int
 

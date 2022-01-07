@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Generic, Optional, TypeVar, cast
+from typing import Any, Generic, TypeVar, cast
 
 T = TypeVar("T")
 
 
 class Result(Generic[T]):
-    def __init__(self, ok: Optional[T] = None, error: Optional[str] = None, data: Optional[Any] = None) -> None:
+    def __init__(self, ok: T | None = None, error: str | None = None, data: Any | None = None) -> None:
         self._ok = ok
         self._error = error
         self._data = data

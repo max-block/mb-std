@@ -1,9 +1,11 @@
 import json
 from dataclasses import asdict, dataclass, field
 from json import JSONDecodeError
-from typing import Any, Optional
+from typing import Any
 
 import requests
+
+from mb_std import md
 
 FIREFOX_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:82.0) Gecko/20100101 Firefox/82.0"
 CHROME_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36"  # noqa
@@ -14,7 +16,7 @@ class HResponse:
     """HTTP Response"""
 
     http_code: int = 0
-    error: Optional[str] = None
+    error: str | None = None
     body: str = ""
     headers: dict = field(default_factory=lambda: {})
 
@@ -70,12 +72,12 @@ def hrequest(
     url: str,
     *,
     method="GET",
-    proxy: Optional[str] = None,
-    params: Optional[dict] = None,
-    headers: Optional[dict] = None,
-    cookies: Optional[dict] = None,
-    timeout=10,
-    user_agent: Optional[str] = None,
+    proxy: str | None = None,
+    params: dict | None = None,
+    headers: dict | None = None,
+    cookies: dict | None = None,
+    timeout: int = 10,
+    user_agent: str | None = None,
     json_params: bool = True,
     auth=None,
 ) -> HResponse:
@@ -85,81 +87,14 @@ def hrequest(
         headers = {}
     try:
         headers["user-agent"] = user_agent
+        request_params = md(method, url, proxies, timeout, headers, cookies, auth)
         if method == "GET":
-            r = requests.get(
-                url,
-                proxies=proxies,
-                timeout=timeout,
-                headers=headers,
-                cookies=cookies,
-                params=params,
-                auth=auth,
-            )
-        elif method == "POST":
-            if json_params:
-                r = requests.post(
-                    url,
-                    proxies=proxies,
-                    timeout=timeout,
-                    headers=headers,
-                    cookies=cookies,
-                    json=params,
-                    auth=auth,
-                )
-            else:
-                r = requests.post(
-                    url,
-                    proxies=proxies,
-                    timeout=timeout,
-                    headers=headers,
-                    cookies=cookies,
-                    data=params,
-                    auth=auth,
-                )
-        elif method == "PUT":
-            if json_params:
-                r = requests.put(
-                    url,
-                    proxies=proxies,
-                    timeout=timeout,
-                    headers=headers,
-                    cookies=cookies,
-                    json=params,
-                    auth=auth,
-                )
-            else:
-                r = requests.put(
-                    url,
-                    proxies=proxies,
-                    timeout=timeout,
-                    headers=headers,
-                    cookies=cookies,
-                    data=params,
-                    auth=auth,
-                )
-        elif method == "DELETE":
-            if json_params:
-                r = requests.delete(
-                    url,
-                    proxies=proxies,
-                    timeout=timeout,
-                    headers=headers,
-                    cookies=cookies,
-                    json=params,
-                    auth=auth,
-                )
-            else:
-                r = requests.delete(
-                    url,
-                    proxies=proxies,
-                    timeout=timeout,
-                    headers=headers,
-                    cookies=cookies,
-                    data=params,
-                    auth=auth,
-                )
+            request_params["params"] = params
+        elif json_params:
+            request_params["json"] = params
         else:
-            raise ValueError(method)
+            request_params["data"] = params
+        r = requests.request(**request_params)
         return HResponse(http_code=r.status_code, body=r.text, headers=dict(r.headers))
     except requests.exceptions.Timeout:
         return HResponse(error="timeout")

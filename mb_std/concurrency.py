@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from logging import Logger
 from threading import Lock, Thread
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Callable, Tuple
 
 from mb_std.date import utc_now
 
@@ -30,7 +30,7 @@ class ParallelTasks:
         self.timeout_error = False
         self.result: dict[str, Any] = {}
 
-    def add_task(self, key: str, func: Callable, args: Tuple = (), kwargs: Optional[dict] = None):
+    def add_task(self, key: str, func: Callable, args: Tuple = (), kwargs: dict | None = None):
         if kwargs is None:
             kwargs = {}
         # noinspection PyCallByClass

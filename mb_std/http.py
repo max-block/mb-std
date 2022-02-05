@@ -68,7 +68,7 @@ class HResponse:
         self._json_parsed = True
 
 
-def hrequest(
+def http_request(
     url: str,
     *,
     method="GET",
@@ -104,3 +104,7 @@ def hrequest(
         return HResponse(error=f"connection_error: {str(e)}")
     except Exception as err:
         return HResponse(error=f"exception: {str(err)}")
+
+
+hrequest = http_request
+hr = http_request

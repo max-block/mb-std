@@ -4,12 +4,12 @@ from datetime import datetime
 
 import requests
 
-from mb_std import ParallelTasks, hrequest
+from mb_std import ParallelTasks, http_request
 from mb_std.concurrency import Scheduler, synchronized_parameter
 
 
 def task1() -> str:
-    res = hrequest("https://httpbin.org/user-agent", user_agent="agent007")
+    res = http_request("https://httpbin.org/user-agent", user_agent="agent007")
     return res.json["user-agent"]
 
 

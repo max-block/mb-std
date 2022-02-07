@@ -48,11 +48,19 @@ class Result(Generic[T]):
     def ok_or_error(self):
         return self.ok if self._error is None else self._error
 
-    def new_ok(self, new_value: Any) -> Result:
+    def replace_ok(self, new_value: Any) -> Result:
         return Result(ok=new_value, data=self._data)
 
-    def new_error(self, new_error: str) -> Result:
+    def replace_error(self, new_error: str) -> Result:
         return Result(error=new_error, data=self._data)
 
     def __repr__(self):
         return str(self.dict())
+
+    @staticmethod
+    def new_ok(ok_value: T, data: Any | None = None) -> Result[T]:
+        return Result(ok=ok_value, data=data)
+
+    @staticmethod
+    def new_error(error: str, data: Any | None = None) -> Result[T]:
+        return Result(error=error, data=data)

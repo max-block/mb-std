@@ -106,5 +106,4 @@ def http_request(
         return HResponse(error=f"exception: {str(err)}")
 
 
-hrequest = http_request
 hr = http_request

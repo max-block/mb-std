@@ -17,12 +17,12 @@ from pymongo.results import DeleteResult, InsertManyResult, InsertOneResult, Upd
 
 class ObjectIdStr(str):
     @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
     def validate(cls, v):
         return str(v)
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
 
 
 class PropertyBaseModel(BaseModel):
@@ -127,6 +127,25 @@ QueryType = dict[str, Any]
 PKType = str | ObjectIdStr | int
 
 
+def parse_str_index_model(index: str) -> IndexModel:
+    unique = index.startswith("!")
+    index = index.removeprefix("!")
+    if "," in index:
+        keys = []
+        for i in index.split(","):
+            order = DESCENDING if i.startswith("-") else ASCENDING
+            i = i.removeprefix("-")
+            keys.append((i, order))
+    else:
+        order = DESCENDING if index.startswith("-") else ASCENDING
+        index = index.removeprefix("-")
+        keys = [(index, order)]
+
+    if unique:
+        return IndexModel(keys, unique=True)
+    return IndexModel(keys)
+
+
 class MongoCollection(Generic[T]):
     def __init__(self, model: Type[T], database: Database, wrap_object_str_id: bool = True):
         if not model.__collection__:
@@ -156,6 +175,9 @@ class MongoCollection(Generic[T]):
     def insert_many(self, docs: list[T], ordered=True) -> InsertManyResult:
         return self.collection.insert_many([obj.dict() for obj in docs], ordered=ordered)
 
+    def _pk(self, pk: PKType):
+        return ObjectId(pk) if self.wrap_object_id else pk
+
     def get_or_none(self, pk: PKType) -> T | None:
         res = self.collection.find_one({"_id": self._pk(pk)})
         if res:
@@ -166,6 +188,14 @@ class MongoCollection(Generic[T]):
         if not res:
             raise MongoNotFoundError(pk)
         return res
+
+    @staticmethod
+    def _sort(sort: SortType):
+        if isinstance(sort, str):
+            if sort.startswith("-"):
+                return [(sort[1:], -1)]
+            return [(sort, 1)]
+        return sort
 
     def find(self, query: QueryType, sort: SortType = None, limit: int = 0) -> list[T]:
         return [self.model_class(**d) for d in self.collection.find(query, sort=self._sort(sort), limit=limit)]
@@ -210,17 +240,6 @@ class MongoCollection(Generic[T]):
     def drop_collection(self):
         return self.collection.drop()
 
-    def _pk(self, pk: PKType):
-        return ObjectId(pk) if self.wrap_object_id else pk
-
-    @staticmethod
-    def _sort(sort: SortType):
-        if isinstance(sort, str):
-            if sort.startswith("-"):
-                return [(sort[1:], -1)]
-            return [(sort, 1)]
-        return sort
-
     @staticmethod
     def init(database: Database, model_class: Type[T]) -> MongoCollection[T]:
         return MongoCollection(model_class, database)
@@ -232,22 +251,3 @@ def make_query(**kwargs) -> QueryType:
         if v:
             query[k] = v
     return query
-
-
-def parse_str_index_model(index: str) -> IndexModel:
-    unique = index.startswith("!")
-    index = index.removeprefix("!")
-    if "," in index:
-        keys = []
-        for i in index.split(","):
-            order = DESCENDING if i.startswith("-") else ASCENDING
-            i = i.removeprefix("-")
-            keys.append((i, order))
-    else:
-        order = DESCENDING if index.startswith("-") else ASCENDING
-        index = index.removeprefix("-")
-        keys = [(index, order)]
-
-    if unique:
-        return IndexModel(keys, unique=True)
-    return IndexModel(keys)

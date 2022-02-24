@@ -13,13 +13,6 @@ from mb_std.date import utc_now
 
 
 class ParallelTasks:
-    @dataclass
-    class Task:
-        key: str
-        func: Callable
-        args: Tuple
-        kwargs: dict
-
     def __init__(self, max_workers=5, timeout=None, thread_name_prefix="parallel_tasks"):
         self.max_workers = max_workers
         self.timeout = timeout
@@ -29,6 +22,13 @@ class ParallelTasks:
         self.error = False
         self.timeout_error = False
         self.result: dict[str, Any] = {}
+
+    @dataclass
+    class Task:
+        key: str
+        func: Callable
+        args: Tuple
+        kwargs: dict
 
     def add_task(self, key: str, func: Callable, args: Tuple = (), kwargs: dict | None = None):
         if kwargs is None:
@@ -75,6 +75,11 @@ def synchronized_parameter(arg_index=0, skip_if_locked=False):
 
 
 class Scheduler:
+    def __init__(self, log: Logger):
+        self.log = log
+        self.stopped = False
+        self.jobs: list[Scheduler.Job] = []
+
     @dataclass
     class Job:
         func: Callable
@@ -82,28 +87,8 @@ class Scheduler:
         is_running: bool = False
         last_at: datetime = field(default_factory=utc_now)
 
-    def __init__(self, log: Logger):
-        self.log = log
-        self.stopped = False
-        self.jobs: list[Scheduler.Job] = []
-
     def add_job(self, func: Callable, interval: int):
         self.jobs.append(Scheduler.Job(func, interval))
-
-    def start(self):
-        Thread(target=self._start).start()
-
-    def stop(self):
-        self.stopped = True
-
-    def _start(self):
-        while not self.stopped:
-            for j in self.jobs:
-                if not j.is_running and j.last_at < utc_now() - timedelta(seconds=j.interval):
-                    j.is_running = True
-                    j.last_at = utc_now()
-                    Thread(target=self._run_job, args=(j,)).start()
-            time.sleep(0.5)
 
     def _run_job(self, job: Job):
         if self.stopped:
@@ -114,3 +99,18 @@ class Scheduler:
             self.log.error("scheduler error:", exc_info=err)
         finally:
             job.is_running = False
+
+    def _start(self):
+        while not self.stopped:
+            for j in self.jobs:
+                if not j.is_running and j.last_at < utc_now() - timedelta(seconds=j.interval):
+                    j.is_running = True
+                    j.last_at = utc_now()
+                    Thread(target=self._run_job, args=(j,)).start()
+            time.sleep(0.5)
+
+    def start(self):
+        Thread(target=self._start).start()
+
+    def stop(self):
+        self.stopped = True

@@ -17,9 +17,6 @@ class Result(Generic[T]):
     def is_error(self):
         return self._error is not None
 
-    def dict(self) -> dict:
-        return {"ok": self.ok, "error": self._error, "data": self.data}
-
     @property
     def ok(self) -> T:
         return cast(T, self._ok)  # type:ignore
@@ -29,20 +26,23 @@ class Result(Generic[T]):
         self._ok = ok
 
     @property
-    def error(self) -> str:
-        return cast(str, self._error)
-
-    @error.setter
-    def error(self, error: str) -> None:
-        self._error = error
-
-    @property
     def data(self):
         return self._data
 
     @data.setter
     def data(self, data: Any) -> None:
         self._data = data
+
+    def dict(self) -> dict:
+        return {"ok": self.ok, "error": self._error, "data": self.data}
+
+    @property
+    def error(self) -> str:
+        return cast(str, self._error)
+
+    @error.setter
+    def error(self, error: str) -> None:
+        self._error = error
 
     @property
     def ok_or_error(self):
@@ -54,9 +54,6 @@ class Result(Generic[T]):
     def replace_error(self, new_error: str) -> Result:
         return Result(error=new_error, data=self._data)
 
-    def __repr__(self):
-        return str(self.dict())
-
     @staticmethod
     def new_ok(ok_value: T, data: Any | None = None) -> Result[T]:
         return Result(ok=ok_value, data=data)
@@ -64,3 +61,6 @@ class Result(Generic[T]):
     @staticmethod
     def new_error(error: str, data: Any | None = None) -> Result[T]:
         return Result(error=error, data=data)
+
+    def __repr__(self):
+        return str(self.dict())

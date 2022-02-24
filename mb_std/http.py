@@ -24,6 +24,15 @@ class HResponse:
     _json_parsed = False
     _json_parsed_error = False
 
+    def _parse_json(self):
+        try:
+            self._json_data = {}
+            self._json_data = json.loads(self.body)
+            self._json_parsed_error = False
+        except JSONDecodeError:
+            self._json_parsed_error = True
+        self._json_parsed = True
+
     @property
     def json(self) -> Any:
         if not self._json_parsed:
@@ -57,15 +66,6 @@ class HResponse:
 
     def is_connection_error(self):
         return self.error and self.error.startswith("connection_error:")
-
-    def _parse_json(self):
-        try:
-            self._json_data = {}
-            self._json_data = json.loads(self.body)
-            self._json_parsed_error = False
-        except JSONDecodeError:
-            self._json_parsed_error = True
-        self._json_parsed = True
 
 
 def http_request(

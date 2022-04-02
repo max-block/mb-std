@@ -36,8 +36,8 @@ setuptools.setup(
             "pre-commit==2.17.0",
             "pytest-xdist==2.5.0",
             "wheel==0.37.1",
-            "twine==3.8.0",
-            "pip-audit==2.1.0",
+            "twine==4.0.0",
+            "pip-audit==2.1.1",
         ],
     },
 )

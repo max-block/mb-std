@@ -3,6 +3,7 @@ from dataclasses import asdict, dataclass, field
 from json import JSONDecodeError
 from typing import Any
 
+import pydash
 import requests
 
 from mb_std import md
@@ -66,6 +67,9 @@ class HResponse:
 
     def is_connection_error(self):
         return self.error and self.error.startswith("connection_error:")
+
+    def to_dict(self):
+        return pydash.omit(asdict(self), "_json_data")
 
 
 def http_request(

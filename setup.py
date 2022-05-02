@@ -24,7 +24,7 @@ setuptools.setup(
         "PySocks==1.7.1",
         "sorcery==0.2.2",
         "pydash==5.1.0",
-        "wrapt==1.14.0",
+        "wrapt==1.14.1",
         "python-dateutil==2.8.2",
         "pymongo==4.1.1",
         "pydantic==1.9.0",
@@ -32,7 +32,7 @@ setuptools.setup(
     ],
     extras_require={
         "dev": [
-            "pytest==7.1.1",
+            "pytest==7.1.2",
             "pre-commit==2.18.1",
             "pytest-xdist==2.5.0",
             "wheel==0.37.1",

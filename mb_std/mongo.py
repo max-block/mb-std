@@ -213,14 +213,14 @@ class MongoCollection(Generic[T]):
     def find_by_id_and_update(self, pk: PKType, update: QueryType) -> T | None:
         return self.find_one_and_update({"_id": self._pk(pk)}, update)
 
-    def update_by_id(self, pk: PKType, update: QueryType) -> UpdateResult:
-        return self.collection.update_one({"_id": self._pk(pk)}, update)
+    def update_by_id(self, pk: PKType, update: QueryType, upsert=False) -> UpdateResult:
+        return self.collection.update_one({"_id": self._pk(pk)}, update, upsert=upsert)
 
     def set_by_id(self, pk: PKType, update: QueryType) -> UpdateResult:
         return self.collection.update_one({"_id": self._pk(pk)}, {"$set": update})
 
-    def update_one(self, query: QueryType, update: QueryType) -> UpdateResult:
-        return self.collection.update_one(query, update)
+    def update_one(self, query: QueryType, update: QueryType, upsert=False) -> UpdateResult:
+        return self.collection.update_one(query, update, upsert=upsert)
 
     def update_many(self, query: QueryType, update: QueryType, upsert=False) -> UpdateResult:
         return self.collection.update_many(query, update, upsert=upsert)

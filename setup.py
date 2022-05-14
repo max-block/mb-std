@@ -33,11 +33,11 @@ setuptools.setup(
     extras_require={
         "dev": [
             "pytest==7.1.2",
-            "pre-commit==2.18.1",
+            "pre-commit==2.19.0",
             "pytest-xdist==2.5.0",
             "wheel==0.37.1",
             "twine==4.0.0",
-            "pip-audit==2.1.1",
+            "pip-audit==2.2.1",
         ],
     },
 )

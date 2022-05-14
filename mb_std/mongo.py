@@ -219,6 +219,9 @@ class MongoCollection(Generic[T]):
     def set_by_id(self, pk: PKType, update: QueryType) -> UpdateResult:
         return self.collection.update_one({"_id": self._pk(pk)}, {"$set": update})
 
+    def set_and_push_by_id(self, pk: PKType, update: QueryType, push: QueryType) -> UpdateResult:
+        return self.collection.update_one({"_id": self._pk(pk)}, {"$set": update, "$push": push})
+
     def update_one(self, query: QueryType, update: QueryType, upsert=False) -> UpdateResult:
         return self.collection.update_one(query, update, upsert=upsert)
 

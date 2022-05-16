@@ -84,6 +84,7 @@ def http_request(
     user_agent: str | None = None,
     json_params: bool = True,
     auth=None,
+    verify=True,
 ) -> HResponse:
     method = method.upper()
     proxies = {"http": proxy, "https": proxy} if proxy else None
@@ -91,7 +92,7 @@ def http_request(
         headers = {}
     try:
         headers["user-agent"] = user_agent
-        request_params = md(method, url, proxies, timeout, headers, cookies, auth)
+        request_params = md(method, url, proxies, timeout, headers, cookies, auth, verify)
         if method == "GET":
             request_params["params"] = params
         elif json_params:

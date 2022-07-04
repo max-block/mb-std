@@ -20,14 +20,14 @@ setuptools.setup(
     version=find_version("mb_std/__init__.py"),
     packages=setuptools.find_packages(exclude=["tests", "tests.*"]),
     install_requires=[
-        "requests==2.27.1",
+        "requests~=2.28.1",
         "PySocks==1.7.1",
         "sorcery==0.2.2",
         "pydash==5.1.0",
         "wrapt==1.14.1",
         "python-dateutil==2.8.2",
         "pymongo==4.1.1",
-        "pydantic==1.9.0",
+        "pydantic~=1.9.0",
         "python-dotenv==0.20.0",
     ],
     extras_require={
@@ -36,8 +36,8 @@ setuptools.setup(
             "pre-commit==2.19.0",
             "pytest-xdist==2.5.0",
             "wheel==0.37.1",
-            "twine==4.0.0",
-            "pip-audit==2.2.1",
+            "twine==4.0.1",
+            "pip-audit==2.4.0",
         ],
     },
 )
